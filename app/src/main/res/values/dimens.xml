@@ -3,5 +3,5 @@
     <dimen name="main_activity_margin">1dp</dimen>
     <dimen name="main_activity_movie_item_width">150dp</dimen>
     <dimen name="main_activity_movie_item_height">200dp</dimen>
-    <dimen name="movie_item_margin">2dp</dimen>
+    <dimen name="movie_item_margin">1dp</dimen>
 </resources>

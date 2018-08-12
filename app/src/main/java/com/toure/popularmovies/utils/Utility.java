@@ -1,6 +1,8 @@
 package com.toure.popularmovies.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.toure.popularmovies.R;
@@ -18,7 +20,7 @@ import retrofit2.Callback;
 
 public class Utility {
 
-    public static final String LOG_TAG = Utility.class.getSimpleName();
+    private static final String LOG_TAG = Utility.class.getSimpleName();
 
     /**
      * Get the top rated movies online
@@ -46,7 +48,7 @@ public class Utility {
      * Launch the request to fet the movies online
      * @param call
      */
-    static void getMoviesOnline(final Context context, Call<MovieApiResponse> call) {
+    private static void getMoviesOnline(final Context context, Call<MovieApiResponse> call) {
         call.enqueue(new Callback<MovieApiResponse>() {
             @Override
             public void onResponse(Call<MovieApiResponse> call, retrofit2.Response<MovieApiResponse> response) {
@@ -67,5 +69,19 @@ public class Utility {
                 Log.e(LOG_TAG, t.getMessage());
             }
         });
+    }
+
+    /**
+     * Determine if the sort order is most popular or top rated
+     *
+     * @param context
+     * @return boolean value indicating the sort order. 'True' if it 'most popular' and 'false' if ist 'top rated'
+     */
+    public static boolean isSortMostPopular(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String sortOrder = sharedPref.getString(context.getString(R.string.pref_sort_order_key),
+                context.getString(R.string.pref_sort_order_most_popular_value));
+        // Return true if the sort order is "most popular" and false if its "top rated"
+        return sortOrder.equals(context.getString(R.string.pref_sort_order_most_popular_value));
     }
 }

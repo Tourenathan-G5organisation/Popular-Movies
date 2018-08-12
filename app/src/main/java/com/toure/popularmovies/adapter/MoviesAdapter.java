@@ -9,10 +9,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.toure.popularmovies.R;
+import com.toure.popularmovies.lib.GlideApp;
+import com.toure.popularmovies.model.Movie;
+
+import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
 
     static final String LOG_TAC = MoviesAdapter.class.getSimpleName();
+
+    private List<Movie> mMovieItems;
+    private Context mContext;
+
+    public MoviesAdapter(Context context) {
+        mContext = context;
+    }
 
     /**
      * @param parent   The ViewGroup into which the new View will be added after it is bound to
@@ -38,6 +49,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
      */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Movie movie = mMovieItems.get(position);
+        GlideApp.with(mContext)
+                .load(getThumbnailUrl(movie.getPosterPath()))
+                .centerInside()
+                .placeholder(R.drawable.placeholder_image)
+                .into(holder.mItemImageView);
+        holder.mItemImageView.setContentDescription(movie.getTitle());
 
     }
 
@@ -48,8 +66,42 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
      */
     @Override
     public int getItemCount() {
-        return 20;
+        return (mMovieItems == null) ? 0 : mMovieItems.size();
     }
+
+    /**
+     * Set the movies to be displayed
+     *
+     * @param moviesItems Movies list to be displayed
+     */
+    public void setMovies(List<Movie> moviesItems) {
+        mMovieItems = moviesItems;
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Add movies to the already existing list
+     *
+     * @param moviesItems Movies list to be added to the already existing list
+     */
+    void addMovies(List<Movie> moviesItems) {
+        if (mMovieItems != null) {
+            mMovieItems.addAll(moviesItems);
+        } else {
+            mMovieItems = moviesItems;
+        }
+        notifyDataSetChanged();
+    }
+
+    private String getThumbnailUrl(String imageRelativeLink) {
+        /*final String IMAGE_SIZE = "w185";
+        Uri uri = Uri.parse(BASE_URL).buildUpon()
+                .appendPath(IMAGE_SIZE)
+                .appendPath(imageRelativeLink)
+                .build();*/
+        return "http://image.tmdb.org/t/p/w185/" + imageRelativeLink;
+    }
+
 
     // Provide a reference to the views for each data item
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -60,4 +112,5 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             mItemImageView = v.findViewById(R.id.movie_list_item_imageview);
         }
     }
+
 }

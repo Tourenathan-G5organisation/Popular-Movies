@@ -1,5 +1,6 @@
 package com.toure.popularmovies.model;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -13,13 +14,13 @@ import java.util.List;
 public interface MovieDao {
 
     @Query("SELECT * FROM movie")
-    List<Movie> getAllItems();
+    LiveData<List<Movie>> getAllItems();
 
     @Query("SELECT * FROM movie ORDER BY vote_count DESC")
-    List<Movie> getTopRatedItems();
+    LiveData<List<Movie>> getTopRatedItems();
 
     @Query("SELECT * FROM movie ORDER BY popularity DESC")
-    List<Movie> getPopularItems();
+    LiveData<List<Movie>> getPopularItems();
 
     @Query("SELECT * FROM movie WHERE id = :id")
     Movie getMoveiItemById( int id);
