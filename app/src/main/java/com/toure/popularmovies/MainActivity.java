@@ -22,7 +22,7 @@ import com.toure.popularmovies.utils.Utility;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, ItemOnClickHandler {
 
     public static final String LOG_TAC = MainActivity.class.getSimpleName();
 
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         // improve performance since change in content do not change the layout size of the RecyclerView
         mMovieRecyclerView.setHasFixedSize(true);
-        mMovieAdapter = new MoviesAdapter(this);
+        mMovieAdapter = new MoviesAdapter(this, this);
         mMovieRecyclerView.setAdapter(mMovieAdapter);
 
         mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -133,5 +133,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onDestroy();
         // unregister the shared preference listener
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    /**
+     * Onclick method use to capture the event
+     *
+     * @param itemId Id of the selected item
+     */
+    @Override
+    public void onClick(int itemId) {
+        Log.d(LOG_TAC, "Item clicked: " + itemId);
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(DetailActivity.ITEM_ID_KEY, itemId);
+        startActivity(intent);
     }
 }

@@ -8,9 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.toure.popularmovies.ItemOnClickHandler;
 import com.toure.popularmovies.R;
 import com.toure.popularmovies.lib.GlideApp;
 import com.toure.popularmovies.model.Movie;
+import com.toure.popularmovies.utils.Utility;
 
 import java.util.List;
 
@@ -20,9 +22,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     private List<Movie> mMovieItems;
     private Context mContext;
+    private final ItemOnClickHandler mClickHandler;
 
-    public MoviesAdapter(Context context) {
+    public MoviesAdapter(Context context, ItemOnClickHandler itemOnClickHandler) {
         mContext = context;
+        mClickHandler = itemOnClickHandler;
     }
 
     /**
@@ -51,7 +55,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mMovieItems.get(position);
         GlideApp.with(mContext)
-                .load(getThumbnailUrl(movie.getPosterPath()))
+                .load(Utility.getPosterUrl(movie.getPosterPath()))
                 .centerInside()
                 .placeholder(R.drawable.placeholder_image)
                 .into(holder.mItemImageView);
@@ -104,12 +108,19 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
 
     // Provide a reference to the views for each data item
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public ImageView mItemImageView;
         public ViewHolder(View v) {
             super(v);
             mItemImageView = v.findViewById(R.id.movie_list_item_imageview);
+            v.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            mClickHandler.onClick(mMovieItems.get(position).getId());
         }
     }
 

@@ -84,4 +84,24 @@ public class Utility {
         // Return true if the sort order is "most popular" and false if its "top rated"
         return sortOrder.equals(context.getString(R.string.pref_sort_order_most_popular_value));
     }
+
+    /**
+     * Get the poster full link
+     *
+     * @param imageRelativeLink Relative link to the poster
+     * @return
+     */
+    public static String getPosterUrl(String imageRelativeLink) {
+        return "http://image.tmdb.org/t/p/w185/" + imageRelativeLink;
+    }
+
+    /**
+     * Get the backdrop full link
+     *
+     * @param imageRelativeLink Relative link to the backdrop
+     * @return
+     */
+    public static String getBackdropUrl(String imageRelativeLink) {
+        return "http://image.tmdb.org/t/p/w500/" + imageRelativeLink;
+    }
 }

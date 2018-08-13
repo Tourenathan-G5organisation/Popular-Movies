@@ -48,4 +48,8 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     // optional - Test helpers for LiveData
     testImplementation "android.arch.core:core-testing:$lifecycle_version"
+
+    // Butter knife
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }
