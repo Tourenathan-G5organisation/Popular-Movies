@@ -10,13 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.toure.popularmovies.lib.GlideApp;
 import com.toure.popularmovies.model.AppDatabase;
 import com.toure.popularmovies.model.Movie;
 import com.toure.popularmovies.utils.Utility;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,15 +31,15 @@ public class DetailActivity extends AppCompatActivity {
 
     // App Database reference
     AppDatabase mDb;
-    LiveData<Movie> mMovie;
-    int mItemId; // Id of the item selected;
+    @BindView(R.id.vote_average)
+    TextView vote_average;
+    private LiveData<Movie> mMovie;
 
     @BindView(R.id.poster)
     ImageView poster;
     @BindView(R.id.backdrop)
     ImageView backdrop;
-    @BindView(R.id.vote_average)
-    RatingBar vote_average;
+    private int mItemId; // Id of the item selected;
     @BindView(R.id.description_textView)
     TextView description;
     @BindView(R.id.released_date_value)
@@ -55,7 +56,11 @@ public class DetailActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
         mDb = AppDatabase.getsInstance(getApplicationContext());
         Intent intent = getIntent();
@@ -98,7 +103,7 @@ public class DetailActivity extends AppCompatActivity {
         poster.setContentDescription(movie.getTitle());
 
         description.setText(movie.getOverview());
-        vote_average.setRating((float) movie.getVoteAverage());
+        vote_average.setText(String.format(Locale.ENGLISH, "%.1f/10", movie.getVoteAverage()));
         releaseDate.setText(movie.getReleaseDate());
         language.setText(movie.getOriginalLanguage());
 

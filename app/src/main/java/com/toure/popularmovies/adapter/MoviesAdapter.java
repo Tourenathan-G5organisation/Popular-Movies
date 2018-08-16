@@ -110,7 +110,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     // Provide a reference to the views for each data item
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public ImageView mItemImageView;
+        ImageView mItemImageView;
         public ViewHolder(View v) {
             super(v);
             mItemImageView = v.findViewById(R.id.movie_list_item_imageview);

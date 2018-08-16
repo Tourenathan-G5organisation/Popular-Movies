@@ -21,5 +21,6 @@
     <string name="title_activity_detail">Movies Details</string>
     <string name="released_on">Released on:</string>
     <string name="original_language">Original language:</string>
+    <string name="rating">Rating:</string>
 
 </resources>

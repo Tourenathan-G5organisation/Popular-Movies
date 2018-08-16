@@ -13,7 +13,7 @@ public class VolleyLib {
     private static VolleyLib mInstance;
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
-    private static Context mCtx;
+    private Context mCtx;
 
     private VolleyLib(Context context) {
         mCtx = context;

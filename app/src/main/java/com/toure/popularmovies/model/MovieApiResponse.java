@@ -19,7 +19,7 @@ public class MovieApiResponse {
     @ColumnInfo(name = "total_pages")
     private int totalPages;
 
-    List<Movie> results;
+    private List<Movie> results;
 
     public int getPage() {
         return page;

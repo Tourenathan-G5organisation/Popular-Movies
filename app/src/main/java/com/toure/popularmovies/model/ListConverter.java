@@ -15,8 +15,7 @@ public class ListConverter {
         if (string != null) {
             Gson gson = new Gson();
             Type collectionType = new TypeToken<List<Integer>>(){}.getType();
-            List<Integer> ints = gson.fromJson(string, collectionType);
-            return ints;
+            return gson.fromJson(string, collectionType);
         }
         return null;
     }
