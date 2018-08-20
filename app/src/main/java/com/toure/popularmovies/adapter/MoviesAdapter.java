@@ -20,6 +20,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     static final String LOG_TAC = MoviesAdapter.class.getSimpleName();
 
+    private static final int ITEM = 0;
+    private static final int LOADING = 1;
+    private boolean isLoadingAdded = false; // Determine if the loading bar is displayed or not
+
     private List<Movie> mMovieItems;
     private Context mContext;
     private final ItemOnClickHandler mClickHandler;
@@ -39,9 +43,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        int layoutIdForListItem = R.layout.movie_list_item;
+        int layoutIdForListItem = 0;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
+        switch (viewType) {
+            case ITEM:
+                layoutIdForListItem = R.layout.movie_list_item;
+                break;
+            case LOADING:
+                layoutIdForListItem = R.layout.movie_loading_more;
+                break;
+        }
         View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
         return new ViewHolder(view);
     }
@@ -73,6 +85,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         return (mMovieItems == null) ? 0 : mMovieItems.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        // Display the loading if the item is the last item or the item detils or otherwise
+        return (position == mMovieItems.size() - 1 && isLoadingAdded) ? LOADING : ITEM;
+    }
+
     /**
      * Set the movies to be displayed
      *
@@ -97,15 +115,51 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
-    private String getThumbnailUrl(String imageRelativeLink) {
-        /*final String IMAGE_SIZE = "w185";
-        Uri uri = Uri.parse(BASE_URL).buildUpon()
-                .appendPath(IMAGE_SIZE)
-                .appendPath(imageRelativeLink)
-                .build();*/
-        return "http://image.tmdb.org/t/p/w185/" + imageRelativeLink;
+
+    public void addMovie(Movie movie) {
+        mMovieItems.add(movie);
+        notifyItemInserted(mMovieItems.size() - 1);
     }
 
+    public void remove(Movie movie) {
+        int position = mMovieItems.indexOf(movie);
+        if (position > -1) {
+            mMovieItems.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    public boolean isEmpty() {
+        return getItemCount() == 0;
+    }
+
+    public void addLoadingFooter() {
+        isLoadingAdded = true;
+        addMovie(new Movie());
+    }
+
+    // Removes the loading progress bar
+    public void removeLoadingFooter() {
+        isLoadingAdded = false;
+
+        int position = mMovieItems.size() - 1;
+        Movie item = getItem(position);
+
+        if (item != null) {
+            mMovieItems.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    /**
+     * Get item at a specified position from the adapter data set
+     *
+     * @param position
+     * @return
+     */
+    public Movie getItem(int position) {
+        return mMovieItems.get(position);
+    }
 
     // Provide a reference to the views for each data item
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
