@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
+import com.toure.popularmovies.BuildConfig;
 import com.toure.popularmovies.R;
 import com.toure.popularmovies.model.AppDatabase;
 import com.toure.popularmovies.model.AppExecutors;
@@ -28,7 +29,7 @@ public class Utility {
     public static void getTopRatedMovies(Context context) {
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
-        Call<MovieApiResponse> call = apiService.getTopRatedMovies(context.getString(R.string.themoviedb_api_key));
+        Call<MovieApiResponse> call = apiService.getTopRatedMovies(BuildConfig.themoviedb_api_key);
 
         getMoviesOnline(context, call);
     }
@@ -39,7 +40,7 @@ public class Utility {
     public static void getPopularMovies(Context context) {
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
-        Call<MovieApiResponse> call = apiService.getPopularMovies(context.getString(R.string.themoviedb_api_key));
+        Call<MovieApiResponse> call = apiService.getPopularMovies(BuildConfig.themoviedb_api_key);
 
         getMoviesOnline(context, call);
     }

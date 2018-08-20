@@ -2,7 +2,7 @@
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
 
-    <string name="themoviedb_api_key" translatable="false"></string>
+
     <string name="title_activity_setting">Settings</string>
 
     <string name="pref_sort_order_key" translatable="false">pref_sort_order_key</string>
