@@ -36,4 +36,7 @@ public interface MovieDao {
 
     @Delete
     void delete(Movie item);
+
+    @Query("DELETE  FROM movie")
+    void deleteAllMovies();
 }

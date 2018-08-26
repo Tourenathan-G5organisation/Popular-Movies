@@ -3,6 +3,8 @@ package com.toure.popularmovies;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.toure.popularmovies.utils.Utility;
+
 public abstract class PaginationScrollListener extends RecyclerView.OnScrollListener {
 
     private GridLayoutManager layoutManager;
@@ -19,7 +21,7 @@ public abstract class PaginationScrollListener extends RecyclerView.OnScrollList
         int totalItemCount = layoutManager.getItemCount();
         int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
 
-        if (!isLoading() && !isLastPage()) {
+        if (Utility.isOnline(recyclerView.getContext()) && !isLoading() && !isLastPage()) {
             if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                     && firstVisibleItemPosition >= 0) {
                 loadMoreItems();

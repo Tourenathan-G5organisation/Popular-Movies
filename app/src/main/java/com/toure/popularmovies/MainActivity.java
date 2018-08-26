@@ -5,14 +5,18 @@ import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.android.volley.RequestQueue;
 import com.toure.popularmovies.adapter.MoviesAdapter;
@@ -28,12 +32,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     RecyclerView mMovieRecyclerView;
     SharedPreferences mSharedPref;
+    // Index from which pagination should start (1 is the first here)
+    public static final int PAGE_START = 1;
     RequestQueue mRequestQueue;
     // LiveData object for the list of movies to be displayed on the main activity
     LiveData<List<Movie>> mMovies;
     private MoviesAdapter mMovieAdapter;
     // Member variable for the database
     private AppDatabase mDb;
+    ProgressBar progressBar;
+    // Indicates if footer ProgressBar is shown (i.e. next page is loading)
+    private boolean isLoading = false;
+    // If current page is the last page (Pagination will stop after this page load)
+    private boolean isLastPage = false;
+    // total no. of pages to load.
+    private int TOTAL_PAGES;
+    // indicates the current page which Pagination is fetching.
+    private int currentPage = PAGE_START;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mDb = AppDatabase.getsInstance(getApplicationContext());
 
         mMovieRecyclerView = findViewById(R.id.movie_recyclerview);
+        progressBar = findViewById(R.id.initial_progressbar);
 
         // improve performance since change in content do not change the layout size of the RecyclerView
         mMovieRecyclerView.setHasFixedSize(true);
@@ -53,25 +69,57 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mMovieRecyclerView.setAdapter(mMovieAdapter);
 
         mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-
-
+        TOTAL_PAGES = mSharedPref.getInt(getString(R.string.total_pages_key), currentPage);
+        if (savedInstanceState != null) {
+            currentPage = savedInstanceState.getInt(getString(R.string.current_page_key), PAGE_START);
+        }
         if (Utility.isSortMostPopular(this)) {
             // get the movies sort by the popularity field
             mMovies = mDb.moviesDao().getPopularItems();
-            Utility.getPopularMovies(this); // Network request to get popular movies
+            Utility.getPopularMovies(this, PAGE_START); // Network request to get popular movies
         } else {
             // Get the movies sorted by the "top rated" field
             mMovies = mDb.moviesDao().getTopRatedItems();
-            Utility.getTopRatedMovies(this); // network request to get the top rated movies
+            Utility.getTopRatedMovies(this, PAGE_START); // network request to get the top rated movies
         }
 
         mMovies.observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
+                if (!movies.isEmpty())
+                    progressBar.setVisibility(View.GONE);
+
+                mMovieAdapter.removeLoadingFooter();
+                isLoading = false;
+
                 mMovieAdapter.setMovies(movies);
             }
         });
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+
+        mMovieRecyclerView.addOnScrollListener(new PaginationScrollListener((GridLayoutManager) mMovieRecyclerView.getLayoutManager()) {
+            @Override
+            protected void loadMoreItems() {
+                isLoading = true;
+                currentPage += 1; //Increment page index to load the next one
+                loadNextPage();
+            }
+
+            @Override
+            public int getTotalPageCount() {
+                return TOTAL_PAGES;
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return isLastPage;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+        });
     }
 
     @Override
@@ -117,6 +165,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Log.d(LOG_TAC, "change in");
         }
 
+        if (key.equals(getString(R.string.total_pages_key))) {
+            TOTAL_PAGES = sharedPreferences.getInt(key, currentPage);
+        }
+
     }
 
     @Override
@@ -126,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 getString(R.string.pref_sort_order_most_popular_value));
         Log.d(LOG_TAC, sortOrder);
         setTitle(sortOrder.substring(0, 1).toUpperCase() + sortOrder.substring(1));
+        Log.d(LOG_TAC, "total:" + TOTAL_PAGES);
     }
 
     @Override
@@ -146,5 +199,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.ITEM_ID_KEY, itemId);
         startActivity(intent);
+    }
+
+    void loadNextPage() {
+        Log.d("scrolling", "current: " + currentPage + " totalpage: " + TOTAL_PAGES);
+        if (currentPage <= TOTAL_PAGES) {
+            mMovieAdapter.addLoadingFooter();
+            if (Utility.isSortMostPopular(this)) {
+                Utility.getPopularMovies(this, currentPage); // Network request to get popular movies
+            } else {
+                Utility.getTopRatedMovies(this, currentPage); // Network request to get top rated movies
+            }
+        } else isLastPage = true;
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt(getString(R.string.current_page_key), currentPage);
     }
 }

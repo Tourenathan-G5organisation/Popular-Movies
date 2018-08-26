@@ -51,7 +51,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
                 layoutIdForListItem = R.layout.movie_list_item;
                 break;
             case LOADING:
-                layoutIdForListItem = R.layout.movie_loading_more;
+                layoutIdForListItem = R.layout.movie_progress_item;
                 break;
         }
         View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
@@ -66,12 +66,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mMovieItems.get(position);
-        GlideApp.with(mContext)
-                .load(Utility.getPosterUrl(movie.getPosterPath()))
-                .centerInside()
-                .placeholder(R.drawable.placeholder_image)
-                .into(holder.mItemImageView);
-        holder.mItemImageView.setContentDescription(movie.getTitle());
+        switch (getItemViewType(position)) {
+            case ITEM:
+                GlideApp.with(mContext)
+                        .load(Utility.getPosterUrl(movie.getPosterPath()))
+                        .centerInside()
+                        .placeholder(R.drawable.placeholder_image)
+                        .into(holder.mItemImageView);
+                holder.mItemImageView.setContentDescription(movie.getTitle());
+                break;
+        }
+
 
     }
 
@@ -142,12 +147,14 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     public void removeLoadingFooter() {
         isLoadingAdded = false;
 
-        int position = mMovieItems.size() - 1;
-        Movie item = getItem(position);
+        if (mMovieItems != null && mMovieItems.size() > 0) {
+            int position = mMovieItems.size() - 1;
+            Movie item = getItem(position);
 
-        if (item != null) {
-            mMovieItems.remove(position);
-            notifyItemRemoved(position);
+            if (item != null) {
+                mMovieItems.remove(position);
+                notifyItemRemoved(position);
+            }
         }
     }
 
@@ -165,10 +172,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView mItemImageView;
+
         public ViewHolder(View v) {
             super(v);
             mItemImageView = v.findViewById(R.id.movie_list_item_imageview);
-            v.setOnClickListener(this);
+            if (mItemImageView != null) {
+                v.setOnClickListener(this);
+            }
         }
 
         @Override

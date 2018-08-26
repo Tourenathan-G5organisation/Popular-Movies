@@ -23,4 +23,7 @@
     <string name="original_language">Original language:</string>
     <string name="rating">Rating:</string>
 
+    <string name="total_pages_key">total_pages_key</string>
+    <string name="current_page_key">current_page_key</string>
+
 </resources>

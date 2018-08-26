@@ -21,4 +21,9 @@
         tools:listitem="@layout/movie_list_item"
         app:spanCount="3" />
 
+    <ProgressBar
+        android:id="@+id/initial_progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </android.support.constraint.ConstraintLayout>

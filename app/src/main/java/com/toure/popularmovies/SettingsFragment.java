@@ -29,9 +29,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         if (key.equals(getString(R.string.pref_sort_order_key))) {
             if (Utility.isSortMostPopular(getContext())) {
-                Utility.getPopularMovies(getActivity());
+                Utility.getPopularMovies(getActivity(), MainActivity.PAGE_START);
             } else {
-                Utility.getTopRatedMovies(getActivity());
+                Utility.getTopRatedMovies(getActivity(), MainActivity.PAGE_START);
             }
             Log.d("Setting frag", key);
         }
