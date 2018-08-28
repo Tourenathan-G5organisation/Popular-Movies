@@ -9,11 +9,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.toure.popularmovies.lib.GlideApp;
 import com.toure.popularmovies.model.AppDatabase;
+import com.toure.popularmovies.model.AppExecutors;
 import com.toure.popularmovies.model.Movie;
 import com.toure.popularmovies.utils.Utility;
 
@@ -48,6 +50,8 @@ public class DetailActivity extends AppCompatActivity {
     TextView language;
     @BindView(R.id.movie_title)
     TextView movieTitle;
+    @BindView(R.id.favourite)
+    ImageView favouriteImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,7 @@ public class DetailActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
+        final Movie[] mmovie = new Movie[1];
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         } catch (NullPointerException e) {
@@ -80,9 +85,23 @@ public class DetailActivity extends AppCompatActivity {
                 @Override
                 public void onChanged(@Nullable Movie movie) {
                     populateUI(movie);
+                    mmovie[0] = movie;
                 }
             });
         }
+
+        favouriteImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mmovie[0].setFavourite(!(mmovie[0].isFavourite()));
+                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDb.moviesDao().update(mmovie[0]);
+                    }
+                });
+            }
+        });
     }
 
     void populateUI(Movie movie) {
@@ -106,6 +125,11 @@ public class DetailActivity extends AppCompatActivity {
         vote_average.setText(String.format(Locale.ENGLISH, "%.1f/10", movie.getVoteAverage()));
         releaseDate.setText(movie.getReleaseDate());
         language.setText(movie.getOriginalLanguage());
+
+        if (movie.isFavourite())
+            favouriteImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_600_24dp));
+        else
+            favouriteImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_grey_400_24dp));
 
     }
 

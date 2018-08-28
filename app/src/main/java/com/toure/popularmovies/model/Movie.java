@@ -58,13 +58,16 @@ public class Movie {
     @ColumnInfo(name = "release_date")
     private String releaseDate;
 
+    @ColumnInfo(name = "favourite")
+    private boolean favourite;
+
     @Ignore
     public Movie() {
     }
 
     public Movie(int id, int voteCount, boolean video, double voteAverage, String title, double popularity,
                  String posterPath, String originalLanguage, String originalTitle, List<Integer> genreIds,
-                 String backdropPath, boolean adult, String overview, String releaseDate) {
+                 String backdropPath, boolean adult, String overview, String releaseDate, boolean favourite) {
         this.id = id;
         this.voteCount = voteCount;
         this.video = video;
@@ -79,6 +82,7 @@ public class Movie {
         this.adult = adult;
         this.overview = overview;
         this.releaseDate = releaseDate;
+        this.favourite = favourite;
     }
 
     public int getId() {
@@ -191,5 +195,13 @@ public class Movie {
 
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
+    }
+
+    public boolean isFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
     }
 }

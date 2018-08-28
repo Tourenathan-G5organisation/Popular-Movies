@@ -138,5 +138,16 @@
             app:layout_constraintTop_toBottomOf="@+id/movie_title"
             tools:text="6.5/10" />
 
+        <ImageView
+            android:id="@+id/favourite"
+            android:layout_width="35dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/like"
+            android:src="@drawable/ic_favorite_grey_400_24dp"
+            app:layout_constraintStart_toEndOf="@+id/vote_average"
+            app:layout_constraintTop_toBottomOf="@+id/movie_title" />
+
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

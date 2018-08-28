@@ -25,5 +25,6 @@
 
     <string name="total_pages_key">total_pages_key</string>
     <string name="current_page_key">current_page_key</string>
+    <string name="like">like</string>
 
 </resources>
