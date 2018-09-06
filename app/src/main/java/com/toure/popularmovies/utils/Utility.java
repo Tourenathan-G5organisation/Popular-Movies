@@ -82,7 +82,7 @@ public class Utility {
     }
 
     /**
-     * Determine if the sort order is most popular or top rated
+     * Determine if the sort order is most popular
      *
      * @param context
      * @return boolean value indicating the sort order. 'True' if it 'most popular' and 'false' if ist 'top rated'
@@ -91,9 +91,38 @@ public class Utility {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         String sortOrder = sharedPref.getString(context.getString(R.string.pref_sort_order_key),
                 context.getString(R.string.pref_sort_order_most_popular_value));
-        // Return true if the sort order is "most popular" and false if its "top rated"
+        // Return true if the sort order is "most popular" and false if its NOT
         return sortOrder.equals(context.getString(R.string.pref_sort_order_most_popular_value));
     }
+
+    /**
+     * Determine if the sort order is top rated
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isSortTopRated(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String sortOrder = sharedPref.getString(context.getString(R.string.pref_sort_order_key),
+                context.getString(R.string.pref_sort_order_most_popular_value));
+        // Return true if the sort order is "top rated" and false if its NOT
+        return sortOrder.equals(context.getString(R.string.pref_sort_order_top_rated_value));
+    }
+
+    /**
+     * Check if the sort order is favourite
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isSortFavourite(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String sortOrder = sharedPref.getString(context.getString(R.string.pref_sort_order_key),
+                context.getString(R.string.pref_sort_order_most_popular_value));
+        // Return true if the sort order is "favourite" and false if its NOT
+        return sortOrder.equals(context.getString(R.string.pref_sort_order_favourite_value));
+    }
+
 
     /**
      * Get the poster full link

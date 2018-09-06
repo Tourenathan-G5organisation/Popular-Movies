@@ -77,10 +77,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // get the movies sort by the popularity field
             mMovies = mDb.moviesDao().getPopularItems();
             Utility.getPopularMovies(this, PAGE_START); // Network request to get popular movies
-        } else {
+        } else if (Utility.isSortTopRated(this)) {
             // Get the movies sorted by the "top rated" field
             mMovies = mDb.moviesDao().getTopRatedItems();
             Utility.getTopRatedMovies(this, PAGE_START); // network request to get the top rated movies
+        } else {
+            mMovies = mDb.moviesDao().getFavouriteItems();
         }
 
         mMovies.observe(this, new Observer<List<Movie>>() {
@@ -152,8 +154,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (key.equals(getString(R.string.pref_sort_order_key))) {
             if (Utility.isSortMostPopular(this)) {
                 mMovies = mDb.moviesDao().getPopularItems();
-            } else {
+            } else if (Utility.isSortTopRated(this)) {
                 mMovies = mDb.moviesDao().getTopRatedItems();
+            } else {
+                mMovies = mDb.moviesDao().getFavouriteItems();
             }
             mMovies.observe(this, new Observer<List<Movie>>() {
                 @Override
