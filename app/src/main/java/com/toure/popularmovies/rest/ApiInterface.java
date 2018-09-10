@@ -1,6 +1,7 @@
 package com.toure.popularmovies.rest;
 
 import com.toure.popularmovies.model.MovieApiResponse;
+import com.toure.popularmovies.model.MovieReviewResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -17,6 +18,12 @@ public interface ApiInterface {
 
     @GET("movie/{id}")
     Call<MovieApiResponse> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);
+
+    @GET("movie/{id}/reviews")
+    Call<MovieReviewResponse> getMovieReviews(@Path("id") int id, @Query("api_key") String apiKey);
+
+    /*@GET("movie/{id}/videos")
+    Call<MovieApiResponse> getMovieTrailers(@Path("id") int id, @Query("api_key") String apiKey);*/
 }
 
 

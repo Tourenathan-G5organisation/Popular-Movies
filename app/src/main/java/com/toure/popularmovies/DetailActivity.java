@@ -9,20 +9,30 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.toure.popularmovies.lib.GlideApp;
 import com.toure.popularmovies.model.AppDatabase;
 import com.toure.popularmovies.model.AppExecutors;
 import com.toure.popularmovies.model.Movie;
+import com.toure.popularmovies.model.MovieReview;
+import com.toure.popularmovies.model.MovieReviewResponse;
+import com.toure.popularmovies.rest.ApiClient;
+import com.toure.popularmovies.rest.ApiInterface;
 import com.toure.popularmovies.utils.Utility;
 
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -52,6 +62,8 @@ public class DetailActivity extends AppCompatActivity {
     TextView movieTitle;
     @BindView(R.id.favourite)
     ImageView favouriteImageView;
+    @BindView(R.id.reviewsLayout)
+    LinearLayout mReviewsLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +114,8 @@ public class DetailActivity extends AppCompatActivity {
                 });
             }
         });
+
+        getMoviesReview();
     }
 
     void populateUI(Movie movie) {
@@ -137,5 +151,41 @@ public class DetailActivity extends AppCompatActivity {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(ITEM_ID_KEY, mItemId);
+    }
+
+    void getMoviesReview() {
+        ApiInterface apiService =
+                ApiClient.getClient().create(ApiInterface.class);
+        Call<MovieReviewResponse> call = apiService.getMovieReviews(mItemId, BuildConfig.themoviedb_api_key);
+        call.enqueue(new Callback<MovieReviewResponse>() {
+            @Override
+            public void onResponse(Call<MovieReviewResponse> call, Response<MovieReviewResponse> response) {
+                Log.d(LOG_TAC, response.body().toString());
+                final List<MovieReview> moviesReviews = response.body().getResults();
+                Log.d(LOG_TAC, "Number of  reviewed: " + moviesReviews.size());
+                if (moviesReviews.size() > 0) {
+                    mReviewsLinearLayout.setVisibility(View.VISIBLE);
+                    for (int i = 0; i < moviesReviews.size(); i++) {
+                        MovieReview review = moviesReviews.get(i);
+                        mReviewsLinearLayout.addView(getNewReview(review.getAuthor(), review.getContent()), LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieReviewResponse> call, Throwable t) {
+                Log.e(LOG_TAC, t.getMessage());
+            }
+        });
+    }
+
+    View getNewReview(String authorName, String comments) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.movie_review_item, mReviewsLinearLayout, false);
+        TextView nameTextView = view.findViewById(R.id.reviewerName);
+        TextView commentTextView = view.findViewById(R.id.reviewText);
+        nameTextView.setText(authorName);
+        commentTextView.setText(comments);
+        return view;
     }
 }
