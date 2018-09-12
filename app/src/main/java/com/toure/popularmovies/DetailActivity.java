@@ -21,6 +21,7 @@ import com.toure.popularmovies.model.AppExecutors;
 import com.toure.popularmovies.model.Movie;
 import com.toure.popularmovies.model.MovieReview;
 import com.toure.popularmovies.model.MovieReviewResponse;
+import com.toure.popularmovies.model.MovieTrailerResponse;
 import com.toure.popularmovies.rest.ApiClient;
 import com.toure.popularmovies.rest.ApiInterface;
 import com.toure.popularmovies.utils.Utility;
@@ -116,6 +117,7 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         getMoviesReview();
+        getTrailers();
     }
 
     void populateUI(Movie movie) {
@@ -153,6 +155,9 @@ public class DetailActivity extends AppCompatActivity {
         outState.putInt(ITEM_ID_KEY, mItemId);
     }
 
+    /**
+     * Make a network request to gete the Movie review details
+     */
     void getMoviesReview() {
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
@@ -181,6 +186,13 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Get the view which will display the review
+     *
+     * @param authorName
+     * @param comments
+     * @return
+     */
     View getNewReview(String authorName, String comments) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.movie_review_item, mReviewsLinearLayout, false);
@@ -189,5 +201,24 @@ public class DetailActivity extends AppCompatActivity {
         nameTextView.setText(authorName);
         commentTextView.setText(comments);
         return view;
+    }
+
+    void getTrailers() {
+        if (Utility.isOnline(this)) {
+            ApiInterface apiService =
+                    ApiClient.getClient().create(ApiInterface.class);
+            Call<MovieTrailerResponse> call = apiService.getMovieTrailers(mItemId, BuildConfig.themoviedb_api_key);
+            call.enqueue(new Callback<MovieTrailerResponse>() {
+                @Override
+                public void onResponse(Call<MovieTrailerResponse> call, Response<MovieTrailerResponse> response) {
+                    Log.d(LOG_TAC, "Number of trailers:" + response.body().getResults().size());
+                }
+
+                @Override
+                public void onFailure(Call<MovieTrailerResponse> call, Throwable t) {
+                    Log.e(LOG_TAC, t.getMessage());
+                }
+            });
+        }
     }
 }
