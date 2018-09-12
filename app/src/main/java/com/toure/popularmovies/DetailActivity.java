@@ -156,27 +156,29 @@ public class DetailActivity extends AppCompatActivity {
     void getMoviesReview() {
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
-        Call<MovieReviewResponse> call = apiService.getMovieReviews(mItemId, BuildConfig.themoviedb_api_key);
-        call.enqueue(new Callback<MovieReviewResponse>() {
-            @Override
-            public void onResponse(Call<MovieReviewResponse> call, Response<MovieReviewResponse> response) {
-                Log.d(LOG_TAC, response.body().toString());
-                final List<MovieReview> moviesReviews = response.body().getResults();
-                Log.d(LOG_TAC, "Number of  reviewed: " + moviesReviews.size());
-                if (moviesReviews.size() > 0) {
-                    mReviewsLinearLayout.setVisibility(View.VISIBLE);
-                    for (int i = 0; i < moviesReviews.size(); i++) {
-                        MovieReview review = moviesReviews.get(i);
-                        mReviewsLinearLayout.addView(getNewReview(review.getAuthor(), review.getContent()), LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        if (Utility.isOnline(this)) {
+            Call<MovieReviewResponse> call = apiService.getMovieReviews(mItemId, BuildConfig.themoviedb_api_key);
+            call.enqueue(new Callback<MovieReviewResponse>() {
+                @Override
+                public void onResponse(Call<MovieReviewResponse> call, Response<MovieReviewResponse> response) {
+                    Log.d(LOG_TAC, response.body().toString());
+                    final List<MovieReview> moviesReviews = response.body().getResults();
+                    Log.d(LOG_TAC, "Number of  reviewed: " + moviesReviews.size());
+                    if (moviesReviews.size() > 0) {
+                        mReviewsLinearLayout.setVisibility(View.VISIBLE);
+                        for (int i = 0; i < moviesReviews.size(); i++) {
+                            MovieReview review = moviesReviews.get(i);
+                            mReviewsLinearLayout.addView(getNewReview(review.getAuthor(), review.getContent()), LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<MovieReviewResponse> call, Throwable t) {
-                Log.e(LOG_TAC, t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<MovieReviewResponse> call, Throwable t) {
+                    Log.e(LOG_TAC, t.getMessage());
+                }
+            });
+        }
     }
 
     View getNewReview(String authorName, String comments) {
