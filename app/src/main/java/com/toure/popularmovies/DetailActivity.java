@@ -2,7 +2,9 @@ package com.toure.popularmovies;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +23,7 @@ import com.toure.popularmovies.model.AppExecutors;
 import com.toure.popularmovies.model.Movie;
 import com.toure.popularmovies.model.MovieReview;
 import com.toure.popularmovies.model.MovieReviewResponse;
+import com.toure.popularmovies.model.MovieTrailer;
 import com.toure.popularmovies.model.MovieTrailerResponse;
 import com.toure.popularmovies.rest.ApiClient;
 import com.toure.popularmovies.rest.ApiInterface;
@@ -65,6 +68,8 @@ public class DetailActivity extends AppCompatActivity {
     ImageView favouriteImageView;
     @BindView(R.id.reviewsLayout)
     LinearLayout mReviewsLinearLayout;
+    @BindView(R.id.trailersLinearLayout)
+    LinearLayout mTrailerLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,9 +194,9 @@ public class DetailActivity extends AppCompatActivity {
     /**
      * Get the view which will display the review
      *
-     * @param authorName
-     * @param comments
-     * @return
+     * @param authorName review author name
+     * @param comments Review text
+     * @return The view inflated
      */
     View getNewReview(String authorName, String comments) {
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -212,6 +217,14 @@ public class DetailActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<MovieTrailerResponse> call, Response<MovieTrailerResponse> response) {
                     Log.d(LOG_TAC, "Number of trailers:" + response.body().getResults().size());
+                    List<MovieTrailer> trailers = response.body().getResults();
+                    if (trailers.size() > 0) {
+                        mTrailerLinearLayout.setVisibility(View.VISIBLE);
+                        for (int i = 0; i < trailers.size(); i++) {
+                            mTrailerLinearLayout.addView(getNewTrailerView(trailers.get(i).getKey(), trailers.get(i).getName()), LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                        }
+                    }
                 }
 
                 @Override
@@ -220,5 +233,31 @@ public class DetailActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    View getNewTrailerView(final String videoId, String name) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.movie_trailer_item, mTrailerLinearLayout, false);
+        ImageView thumbnail = view.findViewById(R.id.trailerThumbnail);
+        thumbnail.setContentDescription(name);
+        GlideApp.with(this)
+                .load("http://img.youtube.com/vi/" + videoId + "/0.jpg")
+                .centerInside()
+                .placeholder(R.drawable.placeholder_image)
+                .into(thumbnail);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
+                Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://www.youtube.com/watch?v=" + videoId));
+                try {
+                    startActivity(appIntent);
+                } catch (ActivityNotFoundException ex) {
+                    startActivity(webIntent);
+                }
+            }
+        });
+        return view;
     }
 }

@@ -151,11 +151,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:orientation="vertical"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
-            app:layout_constraintTop_toBottomOf="@+id/description_textView"
+            app:layout_constraintTop_toBottomOf="@+id/trailers"
             tools:visibility="visible">
 
             <TextView
@@ -167,6 +166,24 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <HorizontalScrollView
+            android:id="@+id/trailers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/description_textView"
+            tools:layout_height="30dp">
 
+            <LinearLayout
+                android:id="@+id/trailersLinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                tools:layout_height="30dp">
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
