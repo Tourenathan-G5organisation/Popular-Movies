@@ -2,6 +2,7 @@ package com.toure.popularmovies;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     // indicates the current page which Pagination is fetching.
     private int currentPage = PAGE_START;
 
+    MainActivityViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,19 +76,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (savedInstanceState != null) {
             currentPage = savedInstanceState.getInt(getString(R.string.current_page_key), PAGE_START);
         }
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        mMovies = viewModel.getmMovies();
         if (Utility.isSortMostPopular(this)) {
             // get the movies sort by the popularity field
-            mMovies = mDb.moviesDao().getPopularItems();
             Utility.getPopularMovies(this, PAGE_START); // Network request to get popular movies
         } else if (Utility.isSortTopRated(this)) {
             // Get the movies sorted by the "top rated" field
-            mMovies = mDb.moviesDao().getTopRatedItems();
             Utility.getTopRatedMovies(this, PAGE_START); // network request to get the top rated movies
-        } else {
-            mMovies = mDb.moviesDao().getFavouriteItems();
         }
 
-        mMovies.observe(this, new Observer<List<Movie>>() {
+        Log.d(LOG_TAC, "Getting data from viewModel");
+        viewModel.getmMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 if (!movies.isEmpty())
@@ -152,14 +154,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(LOG_TAC, "key: " + key);
         if (key.equals(getString(R.string.pref_sort_order_key))) {
-            if (Utility.isSortMostPopular(this)) {
-                mMovies = mDb.moviesDao().getPopularItems();
-            } else if (Utility.isSortTopRated(this)) {
-                mMovies = mDb.moviesDao().getTopRatedItems();
-            } else {
-                mMovies = mDb.moviesDao().getFavouriteItems();
-            }
-            mMovies.observe(this, new Observer<List<Movie>>() {
+
+            viewModel.getmMovies().observe(this, new Observer<List<Movie>>() {
                 @Override
                 public void onChanged(@Nullable List<Movie> movies) {
                     mMovieAdapter.setMovies(movies);

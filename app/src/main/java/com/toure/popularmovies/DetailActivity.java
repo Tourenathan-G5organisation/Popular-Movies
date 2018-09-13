@@ -1,7 +1,7 @@
 package com.toure.popularmovies;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -49,7 +49,6 @@ public class DetailActivity extends AppCompatActivity {
     AppDatabase mDb;
     @BindView(R.id.vote_average)
     TextView vote_average;
-    private LiveData<Movie> mMovie;
 
     @BindView(R.id.poster)
     ImageView poster;
@@ -98,8 +97,10 @@ public class DetailActivity extends AppCompatActivity {
         if (mItemId == DEFAULT_ITEM_ID) {
             finish();
         } else {
-            mMovie = mDb.moviesDao().getMovieItemById(mItemId);
-            mMovie.observe(this, new Observer<Movie>() {
+            DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mItemId);
+            DetailViewModel viewModel =
+                    ViewModelProviders.of(this, factory).get(DetailViewModel.class);
+            viewModel.getmMovie().observe(this, new Observer<Movie>() {
                 @Override
                 public void onChanged(@Nullable Movie movie) {
                     populateUI(movie);
@@ -195,7 +196,7 @@ public class DetailActivity extends AppCompatActivity {
      * Get the view which will display the review
      *
      * @param authorName review author name
-     * @param comments Review text
+     * @param comments   Review text
      * @return The view inflated
      */
     View getNewReview(String authorName, String comments) {
