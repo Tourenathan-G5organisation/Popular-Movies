@@ -40,6 +40,6 @@ public interface MovieDao {
     @Delete
     void delete(Movie item);
 
-    @Query("DELETE  FROM movie")
+    @Query("DELETE  FROM movie WHERE favourite = 0")
     void deleteAllMovies();
 }

@@ -77,17 +77,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             currentPage = savedInstanceState.getInt(getString(R.string.current_page_key), PAGE_START);
         }
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
-        mMovies = viewModel.getmMovies();
+        //mMovies = viewModel.getmMovies();
         if (Utility.isSortMostPopular(this)) {
             // get the movies sort by the popularity field
+            mMovies = mDb.moviesDao().getPopularItems();
             Utility.getPopularMovies(this, PAGE_START); // Network request to get popular movies
         } else if (Utility.isSortTopRated(this)) {
             // Get the movies sorted by the "top rated" field
+            mMovies = mDb.moviesDao().getTopRatedItems();
             Utility.getTopRatedMovies(this, PAGE_START); // network request to get the top rated movies
+        } else {
+            mMovies = mDb.moviesDao().getFavouriteItems();
         }
 
         Log.d(LOG_TAC, "Getting data from viewModel");
-        viewModel.getmMovies().observe(this, new Observer<List<Movie>>() {
+        mMovies.observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 if (!movies.isEmpty())
@@ -154,8 +158,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(LOG_TAC, "key: " + key);
         if (key.equals(getString(R.string.pref_sort_order_key))) {
-
-            viewModel.getmMovies().observe(this, new Observer<List<Movie>>() {
+            if (Utility.isSortMostPopular(this.getApplication())) {
+                // get the movies sort by the popularity field
+                mMovies = mDb.moviesDao().getPopularItems();
+            } else if (Utility.isSortTopRated(this.getApplication())) {
+                // Get the movies sorted by the "top rated" field
+                mMovies = mDb.moviesDao().getTopRatedItems();
+            } else {
+                mMovies = mDb.moviesDao().getFavouriteItems();
+            }
+            mMovies.observe(this, new Observer<List<Movie>>() {
                 @Override
                 public void onChanged(@Nullable List<Movie> movies) {
                     mMovieAdapter.setMovies(movies);
