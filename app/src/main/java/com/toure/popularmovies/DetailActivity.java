@@ -230,7 +230,9 @@ public class DetailActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<MovieTrailerResponse> call, Throwable t) {
-                    Log.e(LOG_TAC, t.getMessage());
+                    if (t != null) {
+                        Log.e(LOG_TAC, t.getMessage());
+                    }
                 }
             });
         }
