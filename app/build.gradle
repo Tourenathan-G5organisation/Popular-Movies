@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
@@ -14,6 +15,10 @@ android {
         // to use this app
         // A valid key will need to be entered
         buildConfigField("String", "themoviedb_api_key", themoviedb_api_key)
+        // Admob app ID
+        buildConfigField("String", "admob_app_ID", admob_app_ID)
+        // Admob full screen add unit id
+        buildConfigField("String", "admob_full_screen_ads_unit", admob_full_screen_ads_unit)
     }
     buildTypes {
         release {
@@ -57,4 +62,11 @@ dependencies {
     // Butter knife
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    // Add dependency
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
+    // Admob
+    implementation 'com.google.firebase:firebase-ads:15.0.1'
 }
+apply plugin: 'com.google.gms.google-services'

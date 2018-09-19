@@ -20,6 +20,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.android.volley.RequestQueue;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.toure.popularmovies.adapter.MoviesAdapter;
 import com.toure.popularmovies.model.AppDatabase;
 import com.toure.popularmovies.model.Movie;
@@ -52,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private int currentPage = PAGE_START;
 
     MainActivityViewModel viewModel;
+
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +133,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return isLoading;
             }
         });
+
+        // Initialise  our admob
+        MobileAds.initialize(this, BuildConfig.admob_app_ID);
+        mInterstitialAd = new InterstitialAd(this);
+        //mInterstitialAd.setAdUnitId(BuildConfig.admob_full_screen_ads_unit);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
     }
 
     @Override
@@ -210,6 +222,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Log.d(LOG_TAC, "Item clicked: " + itemId);
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.ITEM_ID_KEY, itemId);
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Log.d(LOG_TAC, "The interstitial wasn't loaded yet.");
+        }
         startActivity(intent);
     }
 
